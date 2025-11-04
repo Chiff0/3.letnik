@@ -1,0 +1,72 @@
+import java.util.Random;
+import java.io.*;
+import java.net.*;
+
+
+class HTTPServer
+{
+  public static void main (String[] args)
+  {
+    System.out.println("Starting server...");
+    
+    try (ServerSocket socket = new ServerSocket(8080))
+    {
+      while (true)
+      {
+        System.out.println("Waiting for a connection...");
+        Socket clientSocket = socket.accept();
+        System.out.println("Found a connection!");
+        InputStream in = clientSocket.getInputStream();
+        OutputStream out = clientSocket.getOutputStream();
+        
+        requestHandler(in, out);
+
+        clientSocket.close();
+      }
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  } 
+  private static void requestHandler (InputStream in, OutputStream out)
+  {
+    try
+    {
+      System.out.println("Handling the request...");
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+      //handle the header
+      String line = reader.readLine();
+
+      String[] lineParts = line.split(" ");
+
+      String method = lineParts[0];
+      String URI = lineParts[1];
+      //String version = lineParts[2];
+
+      PrintWriter writer = new PrintWriter(out, true);
+            
+      if (method.equals("GET"))
+      {
+        writer.println("HTTP/1.1 200 OK");
+        writer.println();
+        System.out.println("GET request recieved");
+      }
+      else if (method.equals("POST"))
+      {
+        writer.println("HTTP/1.1 200 OK");
+        writer.println();
+        System.out.println("POST request recieved");
+      }
+      
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+    
+  }
+}
+
+
